@@ -2041,4 +2041,32 @@ const DEFAULT_CFG={
 </script>
 
 </body>
+  <!-- === SUPABASE AUTH PROTECTION === -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SB_URL = 'https://lueyjgwjvnmakylwqybi.supabase.co';
+  const SB_KEY = 'sb_publishable_LWk7NY-9b9g5bZ169LHOWg_vmvw1LAI';
+  const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+
+  (async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        // Bloqueia acesso direto ao iframe sem login
+        document.body.innerHTML = `
+          <div style="display:flex;height:100vh;align-items:center;justify-content:center;background:#0b0d10;color:#fff;font-family:system-ui,sans-serif;text-align:center;padding:20px;">
+            <div>
+              <h1 style="font-size:24px;margin-bottom:10px">🔒 Acesso Restrito</h1>
+              <p style="color:#9ca3af;margin-bottom:20px;max-width:300px">Faça login no painel principal para acessar o gerador de etiquetas.</p>
+              <a href="/" style="background:#3b82f6;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block">Voltar para o Login</a>
+            </div>
+          </div>
+        `;
+        document.body.style.margin = '0';
+      }
+    } catch (e) {
+      console.log('Auth check:', e);
+    }
+  })();
+</script>
 </html>
