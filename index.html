@@ -4,370 +4,119 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MercadoHub — Ferramentas Profissionais para Varejo</title>
-    <meta name="description" content="Plataforma completa para varejistas: etiquetas, pesquisa e consulta de preços.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --bg-main: #0b0d10;
-            --bg-surface: #12151b;
-            --bg-card: #181b22;
-            --bg-hover: #22262e;
-            --border: #2a2e37;
-            --text: #f8f9fa;
-            --text-secondary: #9ca3af;
-            --primary: #3b82f6;
-            --primary-glow: rgba(59,130,246,0.15);
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --radius: 12px;
-            --radius-sm: 8px;
-            --shadow: 0 4px 20px rgba(0,0,0,0.4);
+            --bg-main: #0b0d10; --bg-surface: #12151b; --bg-card: #181b22; --bg-hover: #22262e;
+            --border: #2a2e37; --text: #f8f9fa; --text-secondary: #9ca3af;
+            --primary: #3b82f6; --primary-glow: rgba(59,130,246,0.15);
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+            --radius: 12px; --radius-sm: 8px; --shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: var(--bg-main);
-            color: var(--text);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-
-        /* NAVBAR */
-        .navbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1.5rem;
-            height: 64px;
-            background: rgba(11,13,16,0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 800;
-            font-size: 1.15rem;
-            color: var(--text);
-            text-decoration: none;
-            letter-spacing: -0.5px;
-        }
-
-        .brand-icon {
-            width: 30px;
-            height: 30px;
-            background: linear-gradient(135deg, var(--primary), #8b5cf6);
-            border-radius: 8px;
-            display: grid;
-            place-items: center;
-            font-size: 15px;
-            color: white;
-            font-weight: 700;
-        }
-
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg-main); color: var(--text); line-height: 1.6; min-height: 100vh; }
+        
+        .navbar { display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 64px; background: rgba(11,13,16,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.15rem; color: var(--text); text-decoration: none; letter-spacing: -0.5px; }
+        .brand-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--primary), #8b5cf6); border-radius: 8px; display: grid; place-items: center; font-size: 15px; color: white; font-weight: 700; }
         .nav-actions { display: flex; gap: 10px; align-items: center; }
-
-        .btn {
-            padding: 8px 14px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            color: var(--text);
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-
+        .btn { padding: 8px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: inherit; }
         .btn:hover { background: var(--bg-hover); border-color: #3a3f4a; }
         .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
         .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
         .btn-sm { padding: 6px 10px; font-size: 0.8rem; }
-
-        /* HERO */
-        .hero {
-            text-align: center;
-            padding: 4rem 1.5rem 3rem;
-            background: radial-gradient(circle at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 60%);
-        }
-
-        .hero h1 {
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
-            font-weight: 800;
-            margin-bottom: 0.8rem;
-            letter-spacing: -0.5px;
-        }
-
-        .hero h1 span {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero p {
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
-            font-size: 1.05rem;
-        }
-
-        /* MAIN */
-        .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .section-title { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.3px; }
         
-        .apps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-
-        .app-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.2rem;
-            transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .app-card:hover { 
-            border-color: #3a4050; 
-            transform: translateY(-2px); 
-            box-shadow: var(--shadow);
-        }
-
+        .hero { text-align: center; padding: 4rem 1.5rem 3rem; background: radial-gradient(circle at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 60%); }
+        .hero h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; margin-bottom: 0.8rem; letter-spacing: -0.5px; }
+        .hero h1 span { background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 1.05rem; }
+        
+        .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px; }
+        .section-title { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.3px; }
+        .apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+        .app-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem; transition: all 0.2s; position: relative; overflow: hidden; cursor: pointer; }
+        .app-card:hover { border-color: #3a4050; transform: translateY(-2px); box-shadow: var(--shadow); }
         .app-card.disabled { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
         .app-card.disabled:hover { transform: none; border-color: var(--border); box-shadow: none; }
-
-        .app-icon {
-            width: 42px;
-            height: 42px;
-            background: var(--bg-hover);
-            border-radius: 10px;
-            display: grid;
-            place-items: center;
-            font-size: 18px;
-            margin-bottom: 12px;
-        }
-
+        .app-icon { width: 42px; height: 42px; background: var(--bg-hover); border-radius: 10px; display: grid; place-items: center; font-size: 18px; margin-bottom: 12px; }
         .app-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
         .app-desc { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
-        
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 5px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-free { background: rgba(16,185,129,0.12); color: var(--success); }
-        .badge-pro { background: rgba(245,158,11,0.12); color: var(--warning); }
         .badge-soon { background: rgba(156,163,175,0.15); color: var(--text-secondary); }
-
-        /* Usage Bar */
-        .usage-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 10px;
-        }
-        .progress {
-            flex: 1;
-            height: 5px;
-            background: var(--border);
-            border-radius: 3px;
-            overflow: hidden;
-        }
+        
+        .usage-bar { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-secondary); margin-top: 10px; }
+        .progress { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #8b5cf6); width: 0%; transition: 0.4s ease; border-radius: 3px; }
-
-        /* MODALS */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.65);
-            backdrop-filter: blur(4px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-            padding: 1rem;
-        }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; padding: 1rem; }
         .modal-overlay.active { display: flex; }
-
-        .modal {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            width: 100%;
-            max-width: 420px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-        }
-
+        .modal { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 420px; padding: 1.5rem; box-shadow: var(--shadow); }
         .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
         .form-group { margin-bottom: 1rem; }
         .form-label { display: block; font-size: 0.8rem; font-weight: 500; margin-bottom: 0.3rem; color: var(--text-secondary); }
-        .form-input {
-            width: 100%;
-            padding: 10px;
-            background: var(--bg-main);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            color: var(--text);
-            font-size: 0.9rem;
-            font-family: inherit;
-        }
+        .form-input { width: 100%; padding: 10px; background: var(--bg-main); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 0.9rem; font-family: inherit; }
         .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-glow); }
-
         .plan-list { margin: 1rem 0; display: flex; flex-direction: column; gap: 8px; }
-        .plan-item {
-            padding: 14px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-main);
-        }
+        .plan-item { padding: 14px; border: 1px solid var(--border); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); }
         .plan-item.active { border-color: var(--primary); background: rgba(59,130,246,0.05); }
         .plan-price { font-weight: 700; color: var(--primary); }
-
-        /* APP VIEWER */
-        .app-viewer {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: var(--bg-main);
-            z-index: 300;
-            flex-direction: column;
-        }
+        
+        .app-viewer { display: none; position: fixed; inset: 0; background: var(--bg-main); z-index: 300; flex-direction: column; }
         .app-viewer.active { display: flex; }
-        .app-viewer-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1.2rem;
-            height: 48px;
-            background: var(--bg-surface);
-            border-bottom: 1px solid var(--border);
-        }
-        .app-viewer iframe {
-            flex: 1;
-            border: none;
-            width: 100%;
-            background: white;
-        }
-
-        /* TOAST */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 12px 16px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 0.85rem;
-            box-shadow: var(--shadow);
-            transform: translateY(20px);
-            opacity: 0;
-            transition: 0.3s;
-            z-index: 400;
-        }
+        .app-viewer-header { display: flex; align-items: center; justify-content: space-between; padding: 0 1.2rem; height: 48px; background: var(--bg-surface); border-bottom: 1px solid var(--border); }
+        .app-viewer iframe { flex: 1; border: none; width: 100%; background: white; }
+        
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 16px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.85rem; box-shadow: var(--shadow); transform: translateY(20px); opacity: 0; transition: 0.3s; z-index: 400; }
         .toast.show { transform: translateY(0); opacity: 1; }
-
-        @media (max-width: 600px) {
-            .navbar { padding: 0 1rem; }
-            .hero { padding: 3rem 1rem 2rem; }
-            .container { padding: 1.5rem 1rem; }
-            .apps-grid { grid-template-columns: 1fr; }
-            .section-header { flex-direction: column; align-items: flex-start; }
-        }
+        
+        @media (max-width: 600px) { .navbar { padding: 0 1rem; } .hero { padding: 3rem 1rem 2rem; } .container { padding: 1.5rem 1rem; } .apps-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-
-    <!-- Navbar -->
     <nav class="navbar">
         <a href="#" class="brand" onclick="showDashboard()">
-            <div class="brand-icon">M</div>
-            MercadoHub
+            <div class="brand-icon">M</div> MercadoHub
         </a>
         <div class="nav-actions">
             <span id="userBadge" style="font-size:0.8rem; color:var(--text-secondary); display:none;"></span>
-            <button class="btn btn-sm" id="btnLogin" onclick="openModal('login')">Entrar</button>
-            <button class="btn btn-sm btn-primary" id="btnUpgrade" onclick="openModal('plans')">Upgrade</button>
+            <button class="btn btn-sm" id="btnAuthAction" onclick="handleAuthAction()">Entrar</button>
+            <button class="btn btn-sm btn-primary" id="btnUpgrade" onclick="showToast('Em breve: Integração Mercado Pago')">Upgrade</button>
         </div>
     </nav>
 
-    <!-- Hero -->
     <header class="hero">
         <h1>Tudo para o seu <span>varejo</span> em um só lugar</h1>
         <p>Crie etiquetas profissionais, pesquise e consulte preços de forma rápida e segura.</p>
     </header>
 
-    <!-- Dashboard -->
     <main class="container">
         <div class="section-header">
             <div>
                 <h2 class="section-title">Seus aplicativos</h2>
                 <p style="color:var(--text-secondary); font-size:0.85rem;">Ferramentas prontas para uso imediato</p>
             </div>
-            <button class="btn btn-sm" onclick="showToast('Sincronizando...')">🔄 Sincronizar</button>
+            <button class="btn btn-sm" onclick="refreshSession()">🔄 Atualizar</button>
         </div>
-
         <div class="apps-grid">
-            <!-- ETIQUETAS -->
-            <div class="app-card" onclick="openApp('etiquetas')">
+            <div class="app-card" id="cardEtiquetas" onclick="openApp('etiquetas')">
                 <div class="app-icon">🏷️</div>
                 <div class="app-name">Gerador de Etiquetas</div>
                 <div class="app-desc">Etiquetas profissionais com código de barras, selos e exportação em PDF/PNG.</div>
-                <span class="badge badge-free">● Grátis (36/dia)</span>
+                <span class="badge badge-free" id="planBadge">● Grátis (36/dia)</span>
                 <div class="usage-bar">
-                    <span>Usado: <b id="usageCount">0</b>/36</span>
+                    <span>Usado: <b id="usageCount">0</b>/<span id="usageLimit">36</span></span>
                     <div class="progress"><div class="progress-fill" id="progressBar"></div></div>
                 </div>
             </div>
-
-            <!-- PESQUISA DE PREÇOS (EM BREVE) -->
             <div class="app-card disabled">
-                <div class="app-icon">🔍</div>
-                <div class="app-name">Pesquisa de Preços</div>
-                <div class="app-desc">Busque e compare preços de produtos em tempo real em diferentes fornecedores.</div>
+                <div class="app-icon">🔍</div><div class="app-name">Pesquisa de Preços</div><div class="app-desc">Busque e compare preços de produtos em tempo real.</div>
                 <span class="badge badge-soon">⏳ Em desenvolvimento</span>
             </div>
-
-            <!-- CONSULTA DE PREÇOS (EM BREVE) -->
             <div class="app-card disabled">
-                <div class="app-icon">📊</div>
-                <div class="app-name">Consulta de Preços</div>
-                <div class="app-desc">Verifique histórico de preços, margens de lucro e alertas de variação.</div>
+                <div class="app-icon">📊</div><div class="app-name">Consulta de Preços</div><div class="app-desc">Verifique histórico de preços, margens e alertas.</div>
                 <span class="badge badge-soon">⏳ Em desenvolvimento</span>
             </div>
         </div>
@@ -376,7 +125,7 @@
     <!-- LOGIN MODAL -->
     <div class="modal-overlay" id="modal-login">
         <div class="modal">
-            <div class="modal-title">Acessar sua conta</div>
+            <div class="modal-title" id="modalTitle">Acessar sua conta</div>
             <div class="form-group">
                 <label class="form-label">E-mail</label>
                 <input type="email" class="form-input" id="loginEmail" placeholder="voce@email.com">
@@ -385,38 +134,13 @@
                 <label class="form-label">Senha</label>
                 <input type="password" class="form-input" id="loginPass" placeholder="••••••••">
             </div>
-            <button class="btn btn-primary" style="width:100%" onclick="mockLogin()">Entrar</button>
-            <p style="font-size:0.7rem; color:var(--text-secondary); margin-top:12px; text-align:center;">
-                🔒 Demonstração local. Em produção, integraremos Firebase/Supabase.
+            <button class="btn btn-primary" style="width:100%" onclick="executeAuth()">Entrar</button>
+            <p style="font-size:0.7rem; color:var(--text-secondary); margin-top:12px; text-align:center; cursor:pointer;" onclick="toggleAuthMode()">
+                <span id="toggleText">Não tem conta? Cadastre-se</span>
             </p>
         </div>
     </div>
 
-    <!-- PLANS MODAL -->
-    <div class="modal-overlay" id="modal-plans">
-        <div class="modal">
-            <div class="modal-title">Escolha seu plano</div>
-            <div class="plan-list">
-                <div class="plan-item active">
-                    <div>
-                        <div style="font-weight:600">Iniciante</div>
-                        <div style="font-size:0.8rem; color:var(--text-secondary)">36 etiquetas/dia • Funcionalidades básicas</div>
-                    </div>
-                    <span style="color:var(--text-secondary)">Grátis</span>
-                </div>
-                <div class="plan-item">
-                    <div>
-                        <div style="font-weight:600">Profissional</div>
-                        <div style="font-size:0.8rem; color:var(--text-secondary)">Ilimitado • Backup • Sem marca d'água</div>
-                    </div>
-                    <span class="plan-price">R$ 29/mês</span>
-                </div>
-            </div>
-            <button class="btn btn-primary" style="width:100%" onclick="showToast('Integração com gateway de pagamento necessária para ativar.')">Assinar Profissional</button>
-        </div>
-    </div>
-
-    <!-- APP VIEWER -->
     <div class="app-viewer" id="appViewer">
         <div class="app-viewer-header">
             <span style="font-weight:600; font-size:0.9rem;">🏷️ Gerador de Etiquetas</span>
@@ -425,72 +149,140 @@
         <iframe id="appFrame" src="" allowfullscreen allow="clipboard-write"></iframe>
     </div>
 
-    <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
     <script>
-        // --- STATE MANAGEMENT ---
-        const DEFAULT_USER = { email: null, plan: 'free', labelsUsed: 0, limit: 36, lastReset: Date.now() };
-        let user = JSON.parse(localStorage.getItem('mercadohub_user')) || { ...DEFAULT_USER };
+        // --- SUPABASE CONFIG ---
+        const SUPABASE_URL = 'https://lueyjgwjvnmakylwqybi.supabase.co'; 
+        const SUPABASE_KEY = 'sb_publishable_LWk7NY-9b9g5bZ169LHOWg_vmvw1LAI';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Reset daily limit
-        const now = Date.now();
-        const ONE_DAY = 24 * 60 * 60 * 1000;
-        if (now - user.lastReset > ONE_DAY) {
-            user.labelsUsed = 0;
-            user.lastReset = now;
-            saveUser();
-        }
+        let currentUser = null;
+        let userProfile = null;
+        let isLoginMode = true;
 
-        function saveUser() {
-            localStorage.setItem('mercadohub_user', JSON.stringify(user));
-            updateUI();
-        }
-
-        function updateUI() {
-            document.getElementById('usageCount').textContent = user.labelsUsed;
-            const pct = Math.min((user.labelsUsed / user.limit) * 100, 100);
-            document.getElementById('progressBar').style.width = `${pct}%`;
-            
-            if(user.email) {
-                const badge = document.getElementById('userBadge');
-                badge.style.display = 'block';
-                badge.textContent = `👤 ${user.email.split('@')[0]}`;
-                document.getElementById('btnLogin').style.display = 'none';
-                document.getElementById('btnUpgrade').textContent = user.plan === 'pro' ? '✅ Pro' : 'Upgrade';
+        // --- INIT ---
+        async function init() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                await loadUserProfile();
+                updateUIForUser();
             }
         }
+        init();
 
-        // --- MODALS ---
-        function openModal(id) {
-            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-            document.getElementById(`modal-${id}`).classList.add('active');
+        async function loadUserProfile() {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .single();
+            if (!error && data) userProfile = data;
+        }
+
+        // --- UI UPDATES ---
+        function updateUIForUser() {
+            if (!currentUser) return;
+            const email = currentUser.email;
+            document.getElementById('userBadge').style.display = 'block';
+            document.getElementById('userBadge').textContent = `👤 ${email.split('@')[0]}`;
+            
+            const btn = document.getElementById('btnAuthAction');
+            btn.textContent = 'Sair';
+            btn.onclick = logout;
+
+            // Atualizar limite conforme plano
+            const limit = userProfile?.plan === 'pro' ? 9999 : 36;
+            document.getElementById('usageLimit').textContent = userProfile?.plan === 'pro' ? '∞' : '36';
+            document.getElementById('planBadge').textContent = userProfile?.plan === 'pro' ? '✅ Pro (Ilimitado)' : '● Grátis (36/dia)';
+            document.getElementById('planBadge').className = `badge ${userProfile?.plan === 'pro' ? 'badge-pro' : 'badge-free'}`;
+            
+            // Carregar contador do localStorage (simulação - em produção viria do banco)
+            const count = parseInt(localStorage.getItem(`mhub_labels_${currentUser.id}`) || '0');
+            document.getElementById('usageCount').textContent = count;
+            document.getElementById('progressBar').style.width = `${Math.min((count/limit)*100, 100)}%`;
+        }
+
+        function updateUIForGuest() {
+            document.getElementById('userBadge').style.display = 'none';
+            const btn = document.getElementById('btnAuthAction');
+            btn.textContent = 'Entrar';
+            btn.onclick = openModal;
+            document.getElementById('usageCount').textContent = '0';
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('planBadge').textContent = '● Grátis (36/dia)';
+            document.getElementById('planBadge').className = 'badge badge-free';
+        }
+
+        // --- AUTH ACTIONS ---
+        function handleAuthAction() {
+            if (currentUser) logout();
+            else openModal();
+        }
+
+        function openModal() {
+            document.getElementById('modal-login').classList.add('active');
         }
 
         function closeModal() {
-            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            document.getElementById('modal-login').classList.remove('active');
         }
 
-        document.querySelectorAll('.modal-overlay').forEach(m => {
-            m.addEventListener('click', e => { if(e.target === m) closeModal(); });
-        });
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('modalTitle').textContent = isLoginMode ? 'Acessar sua conta' : 'Criar conta';
+            document.getElementById('toggleText').textContent = isLoginMode ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entrar';
+        }
 
-        // --- AUTH MOCK ---
-        function mockLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            if(!email || !email.includes('@')) return showToast('Preencha um e-mail válido');
-            user.email = email;
-            saveUser();
+        async function executeAuth() {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            if(!email || !pass) return showToast('Preencha todos os campos');
+
+            let res;
+            if (isLoginMode) {
+                res = await supabase.auth.signInWithPassword({ email, password: pass });
+            } else {
+                res = await supabase.auth.signUp({ email, password: pass });
+            }
+
+            if (res.error) return showToast('Erro: ' + res.error.message);
+            
+            showToast(isLoginMode ? 'Bem-vindo de volta!' : 'Conta criada! Verifique seu e-mail.');
+            if (res.data.user) {
+                currentUser = res.data.user;
+                await loadUserProfile();
+                updateUIForUser();
+            }
             closeModal();
-            showToast(`Bem-vindo, ${email.split('@')[0]}!`);
+        }
+
+        async function logout() {
+            await supabase.auth.signOut();
+            currentUser = null;
+            userProfile = null;
+            updateUIForGuest();
+            showDashboard();
+            showToast('Desconectado.');
+        }
+
+        async function refreshSession() {
+            if (currentUser) {
+                await loadUserProfile();
+                updateUIForUser();
+                showToast('Sessão atualizada!');
+            }
         }
 
         // --- APP LOADER ---
         function openApp(app) {
+            if(!currentUser) return showToast('Faça login para acessar o app.');
             if(app === 'etiquetas') {
-                if(user.labelsUsed >= user.limit) {
-                    return showToast('Limite diário de 36 etiquetas atingido. Faça upgrade para continuar.');
-                }
+                const limit = userProfile?.plan === 'pro' ? 9999 : 36;
+                const count = parseInt(localStorage.getItem(`mhub_labels_${currentUser.id}`) || '0');
+                if(count >= limit) return showToast(userProfile?.plan === 'pro' ? 'Erro inesperado' : 'Limite diário atingido. Faça upgrade para ilimitado.');
+                
                 document.getElementById('appFrame').src = 'app/etiquetas.html';
                 document.getElementById('appViewer').classList.add('active');
                 document.body.style.overflow = 'hidden';
@@ -498,12 +290,15 @@
         }
 
         function closeApp() {
-            user.labelsUsed++;
-            saveUser();
+            if (currentUser) {
+                const count = parseInt(localStorage.getItem(`mhub_labels_${currentUser.id}`) || '0');
+                localStorage.setItem(`mhub_labels_${currentUser.id}`, count + 1);
+                updateUIForUser();
+                showToast(`Gerada! Restam ${userProfile?.plan === 'pro' ? '∞' : 36 - (count + 1)} hoje.`);
+            }
             document.getElementById('appViewer').classList.remove('active');
             document.getElementById('appFrame').src = '';
             document.body.style.overflow = '';
-            showToast(`Etiqueta gerada! Restam ${user.limit - user.labelsUsed} hoje.`);
         }
 
         function showDashboard() {
@@ -511,7 +306,6 @@
             document.body.style.overflow = '';
         }
 
-        // --- TOAST ---
         function showToast(msg) {
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -519,8 +313,9 @@
             setTimeout(() => t.classList.remove('show'), 3000);
         }
 
-        // --- INIT ---
-        updateUI();
+        document.getElementById('modal-login').addEventListener('click', e => {
+            if(e.target.id === 'modal-login') closeModal();
+        });
     </script>
 </body>
 </html>
