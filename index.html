@@ -45,6 +45,7 @@
         .app-desc { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
         .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 5px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-free { background: rgba(16,185,129,0.12); color: var(--success); }
+        .badge-pro { background: rgba(245,158,11,0.12); color: var(--warning); }
         .badge-soon { background: rgba(156,163,175,0.15); color: var(--text-secondary); }
         
         .usage-bar { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-secondary); margin-top: 10px; }
@@ -83,7 +84,7 @@
         <div class="nav-actions">
             <span id="userBadge" style="font-size:0.8rem; color:var(--text-secondary); display:none;"></span>
             <button class="btn btn-sm" id="btnAuthAction" onclick="handleAuthAction()">Entrar</button>
-            <button class="btn btn-sm btn-primary" id="btnUpgrade" onclick="showToast('Em breve: Integração Mercado Pago')">Upgrade</button>
+            <button class="btn btn-sm btn-primary" id="btnUpgrade" onclick="handleUpgrade()">Upgrade</button>
         </div>
     </nav>
 
@@ -163,7 +164,7 @@
 
         // --- INIT ---
         async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const {  { session } } = await supabase.auth.getSession();
             if (session) {
                 currentUser = session.user;
                 await loadUserProfile();
@@ -173,12 +174,23 @@
         init();
 
         async function loadUserProfile() {
+            if (!currentUser) return;
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('user_id', currentUser.id)
                 .single();
-            if (!error && data) userProfile = data;
+            if (!error && data) {
+                userProfile = data;
+            } else {
+                // Se não existir perfil, cria um
+                const { data: newProfile } = await supabase
+                    .from('profiles')
+                    .insert({ user_id: currentUser.id, email: currentUser.email, plan: 'free' })
+                    .select()
+                    .single();
+                userProfile = newProfile;
+            }
         }
 
         // --- UI UPDATES ---
@@ -193,12 +205,13 @@
             btn.onclick = logout;
 
             // Atualizar limite conforme plano
-            const limit = userProfile?.plan === 'pro' ? 9999 : 36;
-            document.getElementById('usageLimit').textContent = userProfile?.plan === 'pro' ? '∞' : '36';
-            document.getElementById('planBadge').textContent = userProfile?.plan === 'pro' ? '✅ Pro (Ilimitado)' : '● Grátis (36/dia)';
-            document.getElementById('planBadge').className = `badge ${userProfile?.plan === 'pro' ? 'badge-pro' : 'badge-free'}`;
+            const isPro = userProfile?.plan === 'pro';
+            const limit = isPro ? 9999 : 36;
+            document.getElementById('usageLimit').textContent = isPro ? '∞' : '36';
+            document.getElementById('planBadge').textContent = isPro ? '✅ Pro (Ilimitado)' : '● Grátis (36/dia)';
+            document.getElementById('planBadge').className = `badge ${isPro ? 'badge-pro' : 'badge-free'}`;
             
-            // Carregar contador do localStorage (simulação - em produção viria do banco)
+            // Carregar contador do localStorage
             const count = parseInt(localStorage.getItem(`mhub_labels_${currentUser.id}`) || '0');
             document.getElementById('usageCount').textContent = count;
             document.getElementById('progressBar').style.width = `${Math.min((count/limit)*100, 100)}%`;
@@ -219,6 +232,19 @@
         function handleAuthAction() {
             if (currentUser) logout();
             else openModal();
+        }
+
+        function handleUpgrade() {
+            if (!currentUser) {
+                showToast('Faça login primeiro para assinar o plano Pro');
+                openModal();
+                return;
+            }
+            if (userProfile?.plan === 'pro') {
+                showToast('Você já é cliente Pro! 🚀');
+                return;
+            }
+            showToast('Em breve: Integração com Mercado Pago');
         }
 
         function openModal() {
@@ -272,16 +298,31 @@
                 await loadUserProfile();
                 updateUIForUser();
                 showToast('Sessão atualizada!');
+            } else {
+                showToast('Faça login para ver sua sessão');
             }
         }
 
         // --- APP LOADER ---
         function openApp(app) {
-            if(!currentUser) return showToast('Faça login para acessar o app.');
+            if(!currentUser) {
+                showToast('Faça login para acessar o app');
+                openModal();
+                return;
+            }
             if(app === 'etiquetas') {
-                const limit = userProfile?.plan === 'pro' ? 9999 : 36;
+                const isPro = userProfile?.plan === 'pro';
+                const limit = isPro ? 9999 : 36;
                 const count = parseInt(localStorage.getItem(`mhub_labels_${currentUser.id}`) || '0');
-                if(count >= limit) return showToast(userProfile?.plan === 'pro' ? 'Erro inesperado' : 'Limite diário atingido. Faça upgrade para ilimitado.');
+                
+                if(count >= limit) {
+                    if (isPro) {
+                        showToast('Erro inesperado. Entre em contato com suporte');
+                    } else {
+                        showToast('Limite diário atingido! Faça upgrade para ilimitado');
+                    }
+                    return;
+                }
                 
                 document.getElementById('appFrame').src = 'app/etiquetas.html';
                 document.getElementById('appViewer').classList.add('active');
@@ -294,7 +335,9 @@
                 const count = parseInt(localStorage.getItem(`mhub_labels_${currentUser.id}`) || '0');
                 localStorage.setItem(`mhub_labels_${currentUser.id}`, count + 1);
                 updateUIForUser();
-                showToast(`Gerada! Restam ${userProfile?.plan === 'pro' ? '∞' : 36 - (count + 1)} hoje.`);
+                const isPro = userProfile?.plan === 'pro';
+                const remaining = isPro ? '∞' : (36 - (count + 1));
+                showToast(`Etiqueta gerada! Restam ${remaining} hoje.`);
             }
             document.getElementById('appViewer').classList.remove('active');
             document.getElementById('appFrame').src = '';
