@@ -3,167 +3,452 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MercadoHub</title>
+    <title>MercadoHub — Ferramentas Profissionais para Varejo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-card: #334155;
+            --border: #475569;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --radius: 12px;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: #0f172a; 
-            color: #fff; 
-            padding: 20px;
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
         }
-        .navbar { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 20px; 
-            background: #1e293b; 
-            border-radius: 8px;
-            margin-bottom: 30px;
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 2rem;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .brand { font-size: 24px; font-weight: bold; color: #3b82f6; }
-        .btn { 
-            padding: 8px 16px; 
-            background: #3b82f6; 
-            color: white; 
-            border: none; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            margin-left: 10px;
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .btn:hover { background: #2563eb; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .hero { text-align: center; margin-bottom: 40px; }
-        .hero h1 { font-size: 32px; margin-bottom: 10px; }
-        .hero p { color: #94a3b8; }
-        .apps { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .app-card { 
-            background: #1e293b; 
-            padding: 24px; 
-            border-radius: 12px; 
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            font-size: 18px;
+            -webkit-text-fill-color: white;
+        }
+
+        .nav-actions { display: flex; gap: 12px; align-items: center; }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
             cursor: pointer;
-            border: 1px solid #334155;
+            transition: all 0.2s;
+            font-family: inherit;
         }
-        .app-card:hover { border-color: #3b82f6; }
-        .app-card h3 { margin-bottom: 8px; }
-        .app-card p { color: #94a3b8; font-size: 14px; margin-bottom: 12px; }
-        .badge { 
-            display: inline-block; 
-            padding: 4px 8px; 
-            background: #10b981; 
-            color: white; 
-            border-radius: 4px; 
-            font-size: 12px;
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text);
+            border: 1px solid var(--border);
         }
-        .modal { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.8); 
-            align-items: center; 
-            justify-content: center;
-            z-index: 1000;
+
+        .btn-secondary:hover {
+            background: var(--border);
+            transform: translateY(-1px);
         }
-        .modal.active { display: flex; }
-        .modal-content { 
-            background: #1e293b; 
-            padding: 32px; 
-            border-radius: 12px; 
-            width: 100%; 
-            max-width: 400px;
-        }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; margin-bottom: 6px; color: #94a3b8; }
-        .form-group input { 
-            width: 100%; 
-            padding: 10px; 
-            background: #0f172a; 
-            border: 1px solid #334155; 
-            border-radius: 6px; 
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
-        .toast { 
-            position: fixed; 
-            bottom: 20px; 
-            right: 20px; 
-            background: #1e293b; 
-            padding: 12px 20px; 
-            border-radius: 8px; 
-            border: 1px solid #334155;
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem 3rem;
+            background: radial-gradient(circle at 50% 0%, rgba(59,130,246,0.15) 0%, transparent 60%);
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        /* Apps Grid */
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .app-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .app-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+
+        .app-card:hover::before {
+            opacity: 1;
+        }
+
+        .app-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .app-card.disabled:hover {
+            transform: none;
+            border-color: var(--border);
+        }
+
+        .app-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-size: 28px;
+            margin-bottom: 1.2rem;
+        }
+
+        .app-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .app-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-free {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .badge-soon {
+            background: rgba(148, 163, 184, 0.15);
+            color: var(--text-secondary);
+        }
+
+        .usage-bar {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .progress {
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            width: 0%;
+            transition: width 0.4s;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
             display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 1rem;
         }
-        .toast.show { display: block; }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 420px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group { margin-bottom: 1.2rem; }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+
+        .toggle-text {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .toggle-text:hover { color: var(--primary); }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 400;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 1rem; }
+            .hero { padding: 3rem 1rem 2rem; }
+            .container { padding: 1.5rem 1rem; }
+            .apps-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="brand">MercadoHub</div>
-        <div>
-            <span id="userBadge" style="display:none; margin-right:10px; color:#94a3b8;"></span>
-            <button class="btn" id="btnAuth" onclick="handleAuth()">Entrar</button>
-            <button class="btn" onclick="handleUpgrade()">Upgrade</button>
+        <div class="brand">
+            <div class="brand-icon">M</div>
+            MercadoHub
+        </div>
+        <div class="nav-actions">
+            <span id="userBadge" style="display:none; color:var(--text-secondary); font-size:0.9rem;"></span>
+            <button class="btn btn-secondary" id="btnAuth" onclick="handleAuth()">Entrar</button>
+            <button class="btn btn-primary" onclick="handleUpgrade()">Upgrade</button>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="hero">
-            <h1>Tudo para o seu <span style="color:#3b82f6">varejo</span></h1>
-            <p>Crie etiquetas profissionais de forma rápida e segura</p>
+    <header class="hero">
+        <h1>Tudo para o seu <span>varejo</span> em um só lugar</h1>
+        <p>Crie etiquetas profissionais, pesquise e consulte preços de forma rápida e segura.</p>
+    </header>
+
+    <main class="container">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Seus aplicativos</h2>
+                <p style="color:var(--text-secondary); font-size:0.9rem;">Ferramentas prontas para uso imediato</p>
+            </div>
         </div>
 
-        <div class="apps">
+        <div class="apps-grid">
             <div class="app-card" onclick="openApp('etiquetas')">
-                <h3>🏷️ Gerador de Etiquetas</h3>
-                <p>Etiquetas profissionais com código de barras</p>
-                <span class="badge">GRÁTIS (36/dia)</span>
-                <div style="margin-top:12px; font-size:12px; color:#94a3b8;">
-                    Usado: <b id="usageCount">0</b>/36
+                <div class="app-icon">🏷️</div>
+                <div class="app-name">Gerador de Etiquetas</div>
+                <div class="app-desc">Etiquetas profissionais com código de barras, selos e exportação em PDF/PNG.</div>
+                <span class="badge badge-free">● Grátis (36/dia)</span>
+                <div class="usage-bar">
+                    <div>Usado: <b id="usageCount">0</b>/36</div>
+                    <div class="progress"><div class="progress-fill" id="progressBar"></div></div>
                 </div>
             </div>
-            
-            <div class="app-card" style="opacity:0.6;">
-                <h3>🔍 Pesquisa de Preços</h3>
-                <p>Busque e compare preços</p>
-                <span style="background:#64748b; padding:4px 8px; border-radius:4px; font-size:12px;">EM BREVE</span>
+
+            <div class="app-card disabled">
+                <div class="app-icon" style="background:linear-gradient(135deg, #64748b, #94a3b8)">🔍</div>
+                <div class="app-name">Pesquisa de Preços</div>
+                <div class="app-desc">Busque e compare preços de produtos em tempo real em diferentes fornecedores.</div>
+                <span class="badge badge-soon">⏳ Em desenvolvimento</span>
+            </div>
+
+            <div class="app-card disabled">
+                <div class="app-icon" style="background:linear-gradient(135deg, #64748b, #94a3b8)">📊</div>
+                <div class="app-name">Consulta de Preços</div>
+                <div class="app-desc">Verifique histórico de preços, margens de lucro e alertas de variação.</div>
+                <span class="badge badge-soon">⏳ Em desenvolvimento</span>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- LOGIN MODAL -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <h2 style="margin-bottom:20px;">Acessar conta</h2>
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <div class="modal-title" id="modalTitle">Acessar sua conta</div>
             <div class="form-group">
-                <label>E-mail</label>
-                <input type="email" id="email" placeholder="voce@email.com">
+                <label class="form-label">E-mail</label>
+                <input type="email" class="form-input" id="loginEmail" placeholder="voce@email.com">
             </div>
             <div class="form-group">
-                <label>Senha</label>
-                <input type="password" id="password" placeholder="••••••••">
+                <label class="form-label">Senha</label>
+                <input type="password" class="form-input" id="loginPass" placeholder="••••••••">
             </div>
-            <button class="btn" style="width:100%" onclick="executeAuth()">Entrar</button>
-            <p style="margin-top:16px; text-align:center; color:#94a3b8; font-size:14px; cursor:pointer;" onclick="toggleMode()">
+            <button class="btn btn-primary" style="width:100%" onclick="executeAuth()">Entrar</button>
+            <div class="toggle-text" onclick="toggleAuthMode()">
                 <span id="toggleText">Não tem conta? Cadastre-se</span>
-            </p>
-            <button onclick="closeModal()" style="margin-top:10px; width:100%; padding:8px; background:transparent; border:1px solid #334155; color:#94a3b8; border-radius:6px; cursor:pointer;">Cancelar</button>
+            </div>
         </div>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
-        // CONFIGURAÇÃO SUPABASE
         const SUPABASE_URL = 'https://lueyjgwjvnmakylwqybi.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_LWk7NY-9b9g5bZ169LHOWg_vmvw1LAI';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
         let isLoginMode = true;
 
-        // INICIALIZAÇÃO
         async function init() {
-            const { data } = await supabase.auth.getSession();
+            const { data } = await supabaseClient.auth.getSession();
             if (data.session) {
                 currentUser = data.session.user;
                 updateUI();
@@ -183,26 +468,26 @@
             document.getElementById('loginModal').classList.remove('active');
         }
 
-        function toggleMode() {
+        function toggleAuthMode() {
             isLoginMode = !isLoginMode;
-            document.getElementById('toggleText').textContent = isLoginMode ? 
-                'Não tem conta? Cadastre-se' : 'Já tem conta? Entrar';
+            document.getElementById('modalTitle').textContent = isLoginMode ? 'Acessar sua conta' : 'Criar conta';
+            document.getElementById('toggleText').textContent = isLoginMode ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entrar';
         }
 
         async function executeAuth() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPass').value;
 
             if (!email || !password) {
-                showToast('Preencha e-mail e senha');
+                showToast('Preencha todos os campos');
                 return;
             }
 
             let result;
             if (isLoginMode) {
-                result = await supabase.auth.signInWithPassword({ email, password });
+                result = await supabaseClient.auth.signInWithPassword({ email, password });
             } else {
-                result = await supabase.auth.signUp({ email, password });
+                result = await supabaseClient.auth.signUp({ email, password });
             }
 
             if (result.error) {
@@ -210,14 +495,14 @@
                 return;
             }
 
-            showToast(isLoginMode ? 'Bem-vindo!' : 'Conta criada!');
+            showToast(isLoginMode ? 'Bem-vindo de volta!' : 'Conta criada! Verifique seu e-mail.');
             currentUser = result.data.user;
             closeModal();
             updateUI();
         }
 
         async function logout() {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             currentUser = null;
             updateUI();
             showToast('Desconectado');
@@ -231,6 +516,8 @@
                 badge.style.display = 'inline';
                 badge.textContent = '👤 ' + currentUser.email.split('@')[0];
                 btn.textContent = 'Sair';
+                btn.classList.remove('btn-secondary');
+                btn.classList.add('btn-secondary');
             } else {
                 badge.style.display = 'none';
                 btn.textContent = 'Entrar';
@@ -239,15 +526,15 @@
 
         function openApp(appName) {
             if (!currentUser) {
-                showToast('Faça login primeiro');
+                showToast('Faça login para acessar');
                 document.getElementById('loginModal').classList.add('active');
                 return;
             }
 
             if (appName === 'etiquetas') {
-                const count = parseInt(localStorage.getItem('labels_used') || '0');
+                const count = parseInt(localStorage.getItem('mhub_labels_' + currentUser.id) || '0');
                 if (count >= 36) {
-                    showToast('Limite diário atingido!');
+                    showToast('Limite diário atingido! Faça upgrade.');
                     return;
                 }
                 window.location.href = '/app/etiquetas.html';
@@ -255,6 +542,11 @@
         }
 
         function handleUpgrade() {
+            if (!currentUser) {
+                showToast('Faça login primeiro');
+                document.getElementById('loginModal').classList.add('active');
+                return;
+            }
             showToast('Em breve: Integração Mercado Pago');
         }
 
@@ -262,12 +554,13 @@
             const toast = document.getElementById('toast');
             toast.textContent = msg;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
         }
 
-        // Fechar modal ao clicar fora
         document.getElementById('loginModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
+            if (e.target.id === 'loginModal') closeModal();
         });
     </script>
 </body>
