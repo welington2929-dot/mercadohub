@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MercadoHub — Ferramentas Profissionais para Varejo</title>
+    <title>MercadoHub — Ferramentas Profissionais</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- SDK do Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <style>
         :root {
             --bg-main: #0b0f19;
@@ -16,166 +16,58 @@
             --text: #f8fafc;
             --text-secondary: #94a3b8;
             --primary: #3b82f6;
-            --primary-glow: rgba(59,130,246,0.15);
-            --success: #10b981;
-            --warning: #f59e0b;
             --radius: 12px;
             --shadow: 0 8px 30px rgba(0,0,0,0.4);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: var(--bg-main);
-            color: var(--text);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-        .navbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem 2rem;
-            background: rgba(21,27,43,0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .brand {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .brand-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 8px;
-            display: grid;
-            place-items: center;
-            font-size: 16px;
-            -webkit-text-fill-color: white;
-        }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg-main); color: var(--text); line-height: 1.6; min-height: 100vh; }
+        
+        .navbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; background: rgba(21,27,43,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .brand { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; }
+        .brand-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 8px; display: grid; place-items: center; font-size: 16px; -webkit-text-fill-color: white; }
         .nav-actions { display: flex; gap: 12px; align-items: center; }
-        .btn {
-            padding: 10px 18px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-google {
-            background: white;
-            color: #0f172a;
-            border: 1px solid #cbd5e1;
-        }
+        
+        .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; font-family: inherit; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-google { background: white; color: #0f172a; border: 1px solid #cbd5e1; }
         .btn-google:hover { background: #f8fafc; transform: translateY(-1px); }
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
+        .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
         .btn-ghost:hover { color: var(--text); border-color: var(--text-secondary); }
-        .hero {
-            text-align: center;
-            padding: 4rem 1.5rem 3rem;
-            background: radial-gradient(circle at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 60%);
-        }
-        .hero h1 {
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 800;
-            margin-bottom: 0.8rem;
-            letter-spacing: -0.5px;
-        }
-        .hero h1 span {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        
+        .hero { text-align: center; padding: 4rem 1.5rem 3rem; background: radial-gradient(circle at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 60%); }
+        .hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; margin-bottom: 0.8rem; letter-spacing: -0.5px; }
+        .hero h1 span { background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero p { color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 1.05rem; }
+        
         .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
         .section-title { font-size: 1.3rem; font-weight: 700; }
-        .apps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-        .app-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.8rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        .app-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-            opacity: 0; transition: opacity 0.3s;
-        }
+        
+        .apps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .app-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.8rem; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+        .app-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); opacity: 0; transition: opacity 0.3s; }
         .app-card:hover { border-color: #3b82f6; transform: translateY(-4px); box-shadow: var(--shadow); }
         .app-card:hover::before { opacity: 1; }
         .app-card.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
-        .app-icon {
-            width: 52px; height: 52px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 12px;
-            display: grid; place-items: center;
-            font-size: 24px; margin-bottom: 1.2rem;
-        }
+        
+        .app-icon { width: 52px; height: 52px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 12px; display: grid; place-items: center; font-size: 24px; margin-bottom: 1.2rem; }
         .app-name { font-weight: 700; font-size: 1.15rem; margin-bottom: 0.5rem; }
         .app-desc { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; }
-        .badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 4px 10px; border-radius: 6px;
-            font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
-        }
+        
+        .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-free { background: rgba(16,185,129,0.12); color: var(--success); }
         .badge-soon { background: rgba(148,163,184,0.12); color: var(--text-secondary); }
-        .usage-bar {
-            margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);
-            font-size: 0.8rem; color: var(--text-secondary);
-        }
+        
+        .usage-bar { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-secondary); }
         .progress { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 6px; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); width: 0%; transition: width 0.4s; }
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
-            display: none; align-items: center; justify-content: center; z-index: 200; padding: 1rem;
-        }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; padding: 1rem; }
         .modal-overlay.active { display: flex; }
-        .modal {
-            background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius);
-            width: 100%; max-width: 420px; padding: 2rem; box-shadow: var(--shadow); text-align: center;
-        }
+        .modal { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 420px; padding: 2rem; box-shadow: var(--shadow); text-align: center; }
         .modal-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; }
-        .divider { display: flex; align-items: center; margin: 1.5rem 0; color: var(--text-secondary); font-size: 0.85rem; }
-        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-        .divider span { padding: 0 12px; }
-        .turnstile-wrapper { margin-bottom: 1.5rem; display: flex; justify-content: center; min-height: 65px; }
-        .toast {
-            position: fixed; bottom: 24px; right: 24px; padding: 14px 20px;
-            background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px;
-            font-size: 0.9rem; box-shadow: var(--shadow); transform: translateY(20px); opacity: 0;
-            transition: all 0.3s; z-index: 400;
-        }
+        .toast { position: fixed; bottom: 24px; right: 24px; padding: 14px 20px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; font-size: 0.9rem; box-shadow: var(--shadow); transform: translateY(20px); opacity: 0; transition: all 0.3s; z-index: 400; }
         .toast.show { transform: translateY(0); opacity: 1; }
+        
         @media (max-width: 640px) {
             .navbar { padding: 1rem; }
             .hero { padding: 3rem 1rem 2rem; }
@@ -237,49 +129,28 @@
         </div>
     </main>
 
-    <!-- LOGIN MODAL -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="modal">
-            <div class="modal-title">Acessar MercadoHub</div>
-            
-            <!-- PROTEÇÃO ANTI-BOT (Turnstile) -->
-            <div class="turnstile-wrapper">
-                <!-- Substitua SUA_CHAVE_SITEKEY pela chave do Cloudflare Turnstile quando ativar -->
-                <div class="cf-turnstile" data-sitekey="0x4AAAAAAAFz6s4gJz6s4gJ" data-theme="dark"></div>
-            </div>
-
-            <button class="btn btn-google" style="width:100%; justify-content:center; padding:12px; margin-bottom:16px;" onclick="signInWithGoogle()">
-                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                Continuar com Google
-            </button>
-
-            <div class="divider"><span>ou entre com e-mail</span></div>
-
-            <div style="display:flex; gap:8px; margin-bottom:12px;">
-                <input type="email" class="form-input" id="loginEmail" placeholder="seu@email.com" style="flex:1; padding:10px; background:var(--bg-main); border:1px solid var(--border); border-radius:6px; color:var(--text);">
-            </div>
-            <button class="btn btn-ghost" style="width:100%" onclick="executeEmailAuth()">Entrar com e-mail</button>
-            
-            <button onclick="closeModal()" style="margin-top:16px; width:100%; padding:8px; background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:0.85rem;">Cancelar</button>
-        </div>
-    </div>
-
     <div class="toast" id="toast"></div>
 
     <script>
-        // === CONFIGURAÇÃO SUPABASE ===
+        // === CONFIGURAÇÃO SUPABASE (SEM CONFLITO) ===
         const SUPABASE_URL = 'https://lueyjgwjvnmakylwqybi.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_LWk7NY-9b9g5bZ169LHOWg_vmvw1LAI';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Usamos 'supabaseClient' para evitar conflito com o 'supabase' global do script
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
 
         // === INICIALIZAÇÃO ===
         async function init() {
-            const { data } = await supabase.auth.getSession();
-            if (data?.session) {
-                currentUser = data.session.user;
-                updateUI();
+            try {
+                const { data } = await supabaseClient.auth.getSession();
+                if (data?.session) {
+                    currentUser = data.session.user;
+                    updateUI();
+                }
+            } catch (error) {
+                console.error("Erro ao iniciar sessão:", error);
             }
         }
         init();
@@ -287,43 +158,24 @@
         // === AUTENTICAÇÃO ===
         function handleAuth() {
             if (currentUser) {
-                supabase.auth.signOut();
+                supabaseClient.auth.signOut();
                 currentUser = null;
                 updateUI();
                 showToast('Desconectado com sucesso');
             } else {
-                document.getElementById('loginModal').classList.add('active');
+                signInWithGoogle();
             }
-        }
-
-        function closeModal() {
-            document.getElementById('loginModal').classList.remove('active');
-            if (window.turnstile) window.turnstile.reset();
         }
 
         async function signInWithGoogle() {
             try {
-                const { error } = await supabase.auth.signInWithOAuth({
+                const { error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: { redirectTo: window.location.origin }
                 });
                 if (error) throw error;
             } catch (err) {
                 showToast('Erro ao conectar com Google: ' + err.message);
-            }
-        }
-
-        async function executeEmailAuth() {
-            const email = document.getElementById('loginEmail').value.trim();
-            if (!email || !email.includes('@')) return showToast('Insira um e-mail válido');
-            
-            try {
-                const { error } = await supabase.auth.signInWithOtp({ email });
-                if (error) throw error;
-                showToast('Link de acesso enviado para seu e-mail!');
-                closeModal();
-            } catch (err) {
-                showToast('Erro: ' + err.message);
             }
         }
 
@@ -336,18 +188,24 @@
                 const name = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'Usuário';
                 badge.style.display = 'inline';
                 badge.textContent = '👤 ' + name;
+                
+                // Muda o botão para Sair
                 btn.innerHTML = 'Sair';
                 btn.classList.remove('btn-google');
                 btn.classList.add('btn-ghost');
+                
                 loadUsage();
             } else {
                 badge.style.display = 'none';
+                
+                // Restaura o botão de Login
                 btn.innerHTML = `
                     <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                     Entrar com Google
                 `;
                 btn.classList.add('btn-google');
                 btn.classList.remove('btn-ghost');
+                
                 document.getElementById('usageCount').textContent = '0';
                 document.getElementById('progressBar').style.width = '0%';
             }
@@ -364,7 +222,7 @@
         function openApp(app) {
             if (!currentUser) {
                 showToast('Faça login para acessar');
-                document.getElementById('loginModal').classList.add('active');
+                signInWithGoogle();
                 return;
             }
             
@@ -385,11 +243,6 @@
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3500);
         }
-
-        // Fechar modal ao clicar fora
-        document.getElementById('loginModal').addEventListener('click', e => {
-            if (e.target.id === 'loginModal') closeModal();
-        });
     </script>
 </body>
 </html>
